@@ -29,9 +29,9 @@ jobs:
         # with:
         #   creds: ${{ secrets.AZURE_CRED1 }}
         with:
-          client-id: a0da3t8b9-atr35d-47c7-afha0a-26darteb4d3f3c
-          tenant-id: e0ebtr0b0e-a4rt55-477c-b0ert8-56b7rtf7f4efb4
-          subscription-id: 177trb7e12-5frt03-4tf63-tbcd1-ed6dtr1d776bff
+          client-id: a0da38b9-a35d-47c7-aa0a-26daeb4d3f3c
+          tenant-id: e0eb0b0e-a455-477c-b0e8-56b7f7f4efb4
+          subscription-id: 177b7e12-5f03-4f63-bcd1-ed6d1d776bff
       
       - name: Terraform fmt
         id: fmt
