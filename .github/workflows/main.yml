@@ -11,11 +11,11 @@ env:
   ENV_DIR: environment/dev
 
 on:
-  push:
-    branches:
-    - main
-    - release/*
-    - feature/*
+  # push:
+  #   branches:
+  #   - main
+  #   - release/*
+  #   - feature/*
     
 jobs:
   Infra-Build-Job:
