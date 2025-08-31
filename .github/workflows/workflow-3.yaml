@@ -30,7 +30,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CRED }}
 
-      
+    
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check
