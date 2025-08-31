@@ -1,0 +1,149 @@
+name: learn-github-actions
+run-name: ${{ github.actor }} is learning GitHub Actions
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  # ENV_NAME: Dev
+  # ENV_DIR: Environments/${{ env.ENV_NAME }}
+  ENV_DIR: environment/dev
+
+on:
+  push:
+    branches:
+    - main
+    - release/*
+    - feature/*
+    
+jobs:
+  Infra-Build-Job:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout action
+        uses: actions/checkout@v5
+  
+      - name: Azure Login
+        uses: Azure/login@v2
+        with:
+          creds: ${{secrets.SP_CRED}}
+        # with:
+        #   client-id: a0da38b9-a35d-47c7-aa0a-26daeb4d3f3c
+        #   tenant-id: e0eb0b0e-a455-477c-b0e8-56b7f7f4efb4
+        #   subscription-id: 177b7e12-5f03-4f63-bcd1-ed6d1d776bff
+      
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+        working-directory: ${{ env.ENV_DIR }}
+        
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false  
+        working-directory: ${{ env.ENV_DIR }}
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+        working-directory: ${{ env.ENV_DIR }}        
+      
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false
+        #continue-on-error: true
+        working-directory: ${{ env.ENV_DIR }}    
+
+  Approval-for-Deployment:
+    runs-on: ubuntu-latest  # koi bhi lightweight runner chalega
+    needs: Infra-Build-Job
+    steps:
+      - name: Wait for manual approval
+        run: |
+          echo "Waiting for manual approval..."
+          echo "Please approve the job in GitHub UI"
+        shell: bash
+        # yeh manual approval ke liye rukega
+        continue-on-error: false
+        timeout-minutes: 1440
+    # approval ka trick: use `workflow_dispatch` + job approval via GitHub UI
+    environment:
+      name: Deployment-Approval-Needed
+      # required reviewers yahan settings me dena padega
+        
+  Infra-Deployment-job:    
+    runs-on: self-hosted
+    needs: Approval-for-Deployment
+    # environment:
+    #   name: prod-approval-needs  # Yeh environment approval maangega
+    steps:
+      - name: Checkout action
+        uses: actions/checkout@v5
+  
+      - name: Azure Login
+        uses: Azure/login@v2
+        with:
+          creds: ${{secrets.SP_CRED}}
+        # with:
+        #   client-id: a0da38b9-a35d-47c7-aa0a-26daeb4d3f3c
+        #   tenant-id: e0eb0b0e-a455-477c-b0e8-56b7f7f4efb4
+        #   subscription-id: 177b7e12-5f03-4f63-bcd1-ed6d1d776bff
+        
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false  
+        working-directory: ${{ env.ENV_DIR }}
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply --auto-approve
+        #continue-on-error: true
+        working-directory: ${{ env.ENV_DIR }}              
+
+  Approval-for-Destroy:
+    runs-on: ubuntu-latest  # koi bhi lightweight runner chalega
+    needs: Infra-Deployment-job
+    steps:
+      - name: Wait for manual approval
+        run: |
+          echo "Waiting for manual approval..."
+          echo "Please approve the job in GitHub UI"
+        shell: bash
+        # yeh manual approval ke liye rukega
+        continue-on-error: false
+        timeout-minutes: 1440
+    # approval ka trick: use `workflow_dispatch` + job approval via GitHub UI
+    environment:
+      name: Resources Destroy Approval Needed
+      # required reviewers yahan settings me dena padega
+
+  terraform-destroy:    
+    runs-on: self-hosted  
+    needs:   Approval-for-Destroy
+    # environment:
+    #   name: prod-approval-needs  # Yeh environment approval maangega
+    steps:
+      - name: Checkout action
+        uses: actions/checkout@v5
+  
+      - name: Azure Login
+        uses: Azure/login@v2
+        with:
+          creds: ${{secrets.SP_CRED}}
+        # with:
+        #   client-id: a0da38b9-a35d-47c7-aa0a-26daeb4d3f3c
+        #   tenant-id: e0eb0b0e-a455-477c-b0e8-56b7f7f4efb4
+        #   subscription-id: 177b7e12-5f03-4f63-bcd1-ed6d1d776bff
+        
+      - name: Terraform Init for Destroy
+        id: init
+        run: terraform init -input=false  
+        working-directory: ${{ env.ENV_DIR }}
+
+      - name: Terraform Destroy
+        id: apply
+        run: terraform destroy --auto-approve
+        #continue-on-error: true
+        working-directory: ${{ env.ENV_DIR }}              
+
