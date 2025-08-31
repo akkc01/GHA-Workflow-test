@@ -54,12 +54,29 @@ jobs:
         run: terraform plan -no-color -input=false
         #continue-on-error: true
         working-directory: ${{ env.ENV_DIR }}    
+
+  Manual-approval:
+    runs-on: ubuntu-latest  # koi bhi lightweight runner chalega
+    needs: terraform-init-validate-plan
+    steps:
+      - name: Wait for manual approval
+        run: |
+          echo "Waiting for manual approval..."
+          echo "Please approve the job in GitHub UI"
+        shell: bash
+        # yeh manual approval ke liye rukega
+        continue-on-error: false
+        timeout-minutes: 1440
+    # approval ka trick: use `workflow_dispatch` + job approval via GitHub UI
+    environment:
+      name: prod-approval-needs
+      # required reviewers yahan settings me dena padega
         
   terraform-apply:    
     runs-on: self-hosted
-    needs: terraform-init-validate-plan
-    environment:
-      name: prod-approval-needs  # Yeh environment approval maangega
+    needs: Manual-approval
+    # environment:
+    #   name: prod-approval-needs  # Yeh environment approval maangega
     steps:
       - name: Checkout action
         uses: actions/checkout@v5
