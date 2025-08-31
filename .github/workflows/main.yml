@@ -1,21 +1,74 @@
 name: learn-github-actions
 run-name: ${{ github.actor }} is learning GitHub Actions
 
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  ENV_NAME: Dev
+  ENV_DIR: Environments/${{ env.ENV_NAME }}
+
 on:
   push:
     branches:
     - main
     - release/*
+    - feature/*
     
 jobs:
   terraform-init-validate-plan:
     runs-on: self-hosted
     steps:
-      - name: checkout action
-      - uses: actions/checkout@v5
+      - name: Checkout action
+        uses: actions/checkout@v5
   
-      - name: checkout action
-      - uses: actions/checkout@v5
+      - name: Azure Login
+        uses: Azure/login@v2.3.0
+        with:
+          creds: ${{ secrets.azure_cred }}
       
-      - run: npm install -g bats
-      - run: bats -v
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+        working-directory: ${{ env.ENV_DIR }}
+        
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false  
+        working-directory: ${{ env.ENV_DIR }}
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+        working-directory: ${{ env.ENV_DIR }}        
+      
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false
+        #continue-on-error: true
+        working-directory: ${{ env.ENV_DIR }}    
+        
+  terraform-apply:    
+    runs-on: self-hosted
+    needs: terraform-init-validate-plan
+    steps:
+      - name: Checkout action
+        uses: actions/checkout@v5
+  
+      - name: Azure Login
+        uses: Azure/login@v2.3.0
+        with:
+          creds: ${{ secrets.azure_cred }}
+              
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false  
+        working-directory: ${{ env.ENV_DIR }}
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply --auto-approve
+        #continue-on-error: true
+        working-directory: ${{ env.ENV_DIR }}              
