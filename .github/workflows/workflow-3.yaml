@@ -20,8 +20,22 @@ on:
     - feature/*
     
 jobs:
+
+  Terraform-Security-Scan:
+    runs-on: self-hosted
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: tfsec action
+      uses: aquasecurity/tfsec-action@v1.0.3
+
+    - name: Run tfsec scan
+      run: tfsec .
+  
   Infra-Build-Job:
     runs-on: self-hosted
+    needs: Terraform-Security-Scan
     steps:
       - name: Checkout action
         uses: actions/checkout@v5
