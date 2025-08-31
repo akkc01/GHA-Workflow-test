@@ -27,7 +27,7 @@ jobs:
       - name: Azure Login
         uses: Azure/login@v2.3.0
         with:
-          creds: ${{ secrets.azure_cred }}
+          creds: ${{ secrets.AZURE_CRED }}
       
       - name: Terraform fmt
         id: fmt
