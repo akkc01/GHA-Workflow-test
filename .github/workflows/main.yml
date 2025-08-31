@@ -8,7 +8,7 @@ permissions:
 env:
   # ENV_NAME: Dev
   # ENV_DIR: Environments/${{ env.ENV_NAME }}
-  ENV_DIR: environments/dev
+  ENV_DIR: environment/dev
 
 on:
   push:
