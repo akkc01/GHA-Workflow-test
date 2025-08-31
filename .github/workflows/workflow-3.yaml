@@ -27,11 +27,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v5
 
-    - name: tfsec action
-      uses: aquasecurity/tfsec-action@v1.0.3
+    - name: Run tfsec scan (Windows)
+      shell: powershell
+      run: |
+        tfsec .
 
-    - name: Run tfsec scan
-      run: tfsec .
+    # - name: tfsec action
+    #   uses: aquasecurity/tfsec-action@v1.0.3
+
+    # - name: Run tfsec scan
+    #   run: tfsec .
   
   Infra-Build-Job:
     runs-on: self-hosted
