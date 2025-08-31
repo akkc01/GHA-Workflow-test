@@ -26,12 +26,18 @@ jobs:
   
       - name: Azure Login
         uses: Azure/login@v2
-        with:
-          creds: ${{secrets.SP_CRED}}
+        # with:
+        #   creds: ${{secrets.SP_CRED}}
+        #--------------------------------------------
         # with:
         #   client-id: a0da38b9-a35d-47c7-aa0a-26daeb4d3f3c
         #   tenant-id: e0eb0b0e-a455-477c-b0e8-56b7f7f4efb4
         #   subscription-id: 177b7e12-5f03-4f63-bcd1-ed6d1d776bff
+        #-------------------------------------------------------------
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
       - name: Terraform fmt
         id: fmt
@@ -84,11 +90,9 @@ jobs:
       - name: Azure Login
         uses: Azure/login@v2
         with:
-          creds: ${{secrets.SP_CRED}}
-        # with:
-        #   client-id: a0da38b9-a35d-47c7-aa0a-26daeb4d3f3c
-        #   tenant-id: e0eb0b0e-a455-477c-b0e8-56b7f7f4efb4
-        #   subscription-id: 177b7e12-5f03-4f63-bcd1-ed6d1d776bff
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         
       - name: Terraform Init
         id: init
@@ -130,11 +134,9 @@ jobs:
       - name: Azure Login
         uses: Azure/login@v2
         with:
-          creds: ${{secrets.SP_CRED}}
-        # with:
-        #   client-id: a0da38b9-a35d-47c7-aa0a-26daeb4d3f3c
-        #   tenant-id: e0eb0b0e-a455-477c-b0e8-56b7f7f4efb4
-        #   subscription-id: 177b7e12-5f03-4f63-bcd1-ed6d1d776bff
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         
       - name: Terraform Init for Destroy
         id: init
