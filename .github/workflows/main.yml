@@ -104,6 +104,8 @@ jobs:
   terraform-destroy:    
     runs-on: self-hosted
     needs:   terraform-apply
+    environment:
+      name: prod-approval-needs  # Yeh environment approval maangega
     steps:
       - name: Checkout action
         uses: actions/checkout@v5
