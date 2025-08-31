@@ -32,7 +32,12 @@ jobs:
     #   shell: pwsh
     #   run: |
     #     tfsec .
-
+    - name: Install tfsec
+      run: |
+        curl -sSL https://github.com/aquasecurity/tfsec/releases/latest/download/tfsec-linux-amd64 -o tfsec
+        chmod +x tfsec
+        sudo mv tfsec /usr/local/bin/tfsec
+        
     - name: tfsec action
       uses: aquasecurity/tfsec-action@v1.0.3
 
