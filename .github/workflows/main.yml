@@ -18,7 +18,7 @@ on:
     - feature/*
     
 jobs:
-  terraform-init-validate-plan:
+  Infra-Build-Job:
     runs-on: self-hosted
     steps:
       - name: Checkout action
@@ -55,9 +55,9 @@ jobs:
         #continue-on-error: true
         working-directory: ${{ env.ENV_DIR }}    
 
-  Manual-approval:
+  Approval-for-Deployment:
     runs-on: ubuntu-latest  # koi bhi lightweight runner chalega
-    needs: terraform-init-validate-plan
+    needs: Infra-Build-Job
     steps:
       - name: Wait for manual approval
         run: |
@@ -69,12 +69,12 @@ jobs:
         timeout-minutes: 1440
     # approval ka trick: use `workflow_dispatch` + job approval via GitHub UI
     environment:
-      name: prod-approval-needs
+      name: Deployment-Approval-Needed
       # required reviewers yahan settings me dena padega
         
-  terraform-apply:    
+  Infra-Deployment-job:    
     runs-on: self-hosted
-    needs: Manual-approval
+    needs: Approval-for-Deployment
     # environment:
     #   name: prod-approval-needs  # Yeh environment approval maangega
     steps:
@@ -101,11 +101,28 @@ jobs:
         #continue-on-error: true
         working-directory: ${{ env.ENV_DIR }}              
 
-  terraform-destroy:    
-    runs-on: self-hosted
-    needs:   terraform-apply
+  Approval-for-Destroy:
+    runs-on: ubuntu-latest  # koi bhi lightweight runner chalega
+    needs: Infra-Deployment-job
+    steps:
+      - name: Wait for manual approval
+        run: |
+          echo "Waiting for manual approval..."
+          echo "Please approve the job in GitHub UI"
+        shell: bash
+        # yeh manual approval ke liye rukega
+        continue-on-error: false
+        timeout-minutes: 1440
+    # approval ka trick: use `workflow_dispatch` + job approval via GitHub UI
     environment:
-      name: prod-approval-needs  # Yeh environment approval maangega
+      name: Resources Destroy Approval Needed
+      # required reviewers yahan settings me dena padega
+
+  terraform-destroy:    
+    runs-on: self-hosted  
+    needs:   Approval-for-Destroy
+    # environment:
+    #   name: prod-approval-needs  # Yeh environment approval maangega
     steps:
       - name: Checkout action
         uses: actions/checkout@v5
