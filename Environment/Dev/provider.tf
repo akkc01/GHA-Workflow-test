@@ -7,10 +7,10 @@ terraform {
   }
 
   backend "azurerm" {
-    resource_group_name  = "jarvis"
-    storage_account_name = "jarvisstorageaccount001"
-    container_name       = "jarvis"
-    key                  = "vinod.tfstate"
+    resource_group_name  = "dkcstate-rg"
+    storage_account_name = "dkcstorageaccount"
+    container_name       = "dkccontainer"
+    key                  = "akkc.dev.tfstate"
   }
 }
 
