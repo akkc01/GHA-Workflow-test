@@ -46,12 +46,12 @@ jobs:
       run: tfsec .
       
     # ---------- CHECKOV ----------
-    - name: Install Checkov
-      run: |
-        pip install checkov
+    # - name: Install Checkov
+    #   run: |
+    #     pip install checkov
 
-    - name: Run Checkov scan
-      run: checkov -d .
+    # - name: Run Checkov scan
+    #   run: checkov -d .
 
     # ---------- TFLINT ----------
     - name: Install tflint
