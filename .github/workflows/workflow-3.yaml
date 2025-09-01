@@ -41,6 +41,7 @@ jobs:
     - name: tfsec action
       uses: aquasecurity/tfsec-action@v1.0.3
 
+
     - name: Run tfsec scan
       run: tfsec .
       
