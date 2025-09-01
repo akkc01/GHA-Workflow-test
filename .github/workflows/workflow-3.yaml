@@ -103,14 +103,14 @@ jobs:
     needs: Infra-Build-Job
     steps:
       - name: Wait for manual approval
-        run: |
-          echo "Waiting for manual approval..."
-          echo "Please approve the job in GitHub UI"
-        shell: bash
-        # yeh manual approval ke liye rukega
-        continue-on-error: false
-        timeout-minutes: 1440
-    # approval ka trick: use `workflow_dispatch` + job approval via GitHub UI
+    #     run: |
+    #       echo "Waiting for manual approval..."
+    #       echo "Please approve the job in GitHub UI"
+    #     shell: bash
+    #     # yeh manual approval ke liye rukega
+    #     continue-on-error: false
+    #     timeout-minutes: 1440
+    # # approval ka trick: use `workflow_dispatch` + job approval via GitHub UI
     environment:
       name: Deployment-Approval-Needed
       # required reviewers yahan settings me dena padega
