@@ -25,3 +25,19 @@ module "subnet" {
   address_prefixes1 = ["192.168.4.64/26"]
 }
 
+module "nsg" {
+  source   = "../../module/azurerm_network_security_group"
+  depends_on = [ module.rg, module.vnet, module.subnet ]
+  nsg_name = "varddha-nsg001"
+  rg_name  = "varddha-rg001"
+  location = "centralindia"
+
+}
+module "nsg_sub_asso" {
+  depends_on = [ module.rg, module.vnet, module.subnet, module.nsg ]
+  source                    = "../../module/azurerm_nsg_subnet_assoc"
+  frontend_subnet_id        = module.subnet.frontend_subnet_id
+  backend_subnet_id         = module.subnet.backend_subnet_id
+  network_security_group_id = module.nsg.nsg_id
+}
+
